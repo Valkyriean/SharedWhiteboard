@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
@@ -24,6 +25,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.Component;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextArea;
 
 public class GUI extends JFrame{
 
@@ -36,59 +40,106 @@ public class GUI extends JFrame{
         new GUI();
 
     }
-    private int state;
+    private String state;
     private int tempx,tempy;
     private ArrayList<Shape> shapes = new ArrayList<Shape>();
     
     private void click(int x, int y) {
     	System.out.println(x);
     	System.out.println(y);
-    	if(state==0) {
+    	System.out.println(state);
+    	System.out.println(shapes);
+    	if(state=="line_start") {
     		this.tempx=x;
     		this.tempy=y;
-    		state = 1;
-    	}else if(state ==1) {
-    		shapes.add(new Line2D.Float(tempx, tempy, x, y));
-    		state=0;
+    		state = "line_end";
+    		status.setText("Now, click on canvas at where you want line end.");
+    	}else if(state =="line_end") {
+    		shapes.add(new Line2D.Double(tempx, tempy, x, y));
+    		state="null";
+    		status.setText("Plase select the shape you want at left");
+    	}
+    	else if(state=="rec_start") {
+    		this.tempx=x;
+    		this.tempy=y;
+    		state = "rec_end";
+    		status.setText("Now, click on canvas at where you want bottom right be.");
+
+    	}else if(state =="rec_end") {
+    		shapes.add(new Rectangle(tempx, tempy, x-tempx, y-tempy));
+    		state="null";
+    		status.setText("Plase select the shape you want at left");
+    	}
+    	else if(state=="circle_start") {
+    		this.tempx=x;
+    		this.tempy=y;
+    		state = "rec_end";
+    		status.setText("Now, click on canvas at where you want bottom right be.");
+
+    	}else if(state =="rec_end") {
+    		shapes.add(new Rectangle(tempx, tempy, x-tempx, y-tempy));
+    		state="null";
+    		status.setText("Plase select the shape you want at left");
     	}
 
     }
     
+    JTextArea status = new JTextArea();
+    
     public GUI(){
-    	this.state=0;
+    	this.state="null";
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
         this.setTitle("Drawing tings");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        JButton btnNewButton = new JButton("New button");
-        
-        JButton btnNewButton_1 = new JButton("New button");
-        
-        JButton btnNewButton_3 = new JButton("New button");
+        JButton line = new JButton("Line");
+        JButton triangle = new JButton("Triangle");
+        JButton circle = new JButton("Circle");
+        JButton rectangle = new JButton("Rectangle");
+
         
         JComponent panel = new GraphicsPanel();
+//        JComponent panel = new JPanel();
         panel.setBackground(Color.WHITE);
-        int x = 1;
-        panel.addMouseListener(new MouseAdapter() {
+        
+        
+        status.setText("Plase select the shape you want at left");
+        
+        line.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		click(e.getX(),e.getY());
+        		state = "line_start";
+        		status.setText("Line selected, click on canves at where you want line start from.");
         	}
         });
+        
+        rectangle.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		state = "rec_start";
+        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
+        	}
+        });
+        
+
+
         
         GroupLayout groupLayout = new GroupLayout(getContentPane());
         groupLayout.setHorizontalGroup(
         	groupLayout.createParallelGroup(Alignment.TRAILING)
         		.addGroup(groupLayout.createSequentialGroup()
         			.addContainerGap()
-        			.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-        				.addComponent(btnNewButton_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-        				.addComponent(btnNewButton_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-        				.addComponent(btnNewButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        				.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
+        				.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
+        				.addComponent(circle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
+        				.addComponent(line, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
         			.addGap(53)
-        			.addComponent(panel, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
-        			.addGap(124))
+        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        				.addComponent(status)
+        				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
+        			.addGap(136))
         );
         groupLayout.setVerticalGroup(
         	groupLayout.createParallelGroup(Alignment.LEADING)
@@ -96,13 +147,17 @@ public class GUI extends JFrame{
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         				.addGroup(groupLayout.createSequentialGroup()
         					.addGap(17)
-        					.addComponent(btnNewButton)
+        					.addComponent(line)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(btnNewButton_3)
+        					.addComponent(circle)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(btnNewButton_1))
+        					.addComponent(triangle)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addComponent(rectangle))
         				.addGroup(groupLayout.createSequentialGroup()
-        					.addGap(37)
+        					.addGap(9)
+        					.addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 365, GroupLayout.PREFERRED_SIZE)))
         			.addContainerGap(148, Short.MAX_VALUE))
         );
@@ -128,63 +183,43 @@ public class GUI extends JFrame{
       
         
         this.setVisible(true);
+        
+        Shape rootRect = new Rectangle(30, 50, 420, 120);
+        Shape rootline = new Line2D.Float(10, 10, 500, 400);
+        shapes.add(rootRect);
+        shapes.add(rootline);
 
     }
 
     public class GraphicsPanel extends JPanel {
 
         public GraphicsPanel(){
-//            setLayout(new BorderLayout());
-//            this.setPreferredSize(new Dimension(1000,1000));
-//            this.add(new DrawStuff(), BorderLayout.CENTER);
-//            revalidate();
-//            repaint();
+
+            this.addMouseListener(new MouseAdapter() {
+            	@Override
+            	public void mouseClicked(MouseEvent e) {
+            		click(e.getX(),e.getY());
+            		repaint();
+            	}
+            });
             this.setVisible(true); //probably not necessary
 
         }
+
         
-        protected void paintComponent(Graphics g){
-            super.paintComponent(g);
+        public void paint(Graphics g){
+            super.paint(g);
 
             Graphics2D graph2 = (Graphics2D) g;
 
             graph2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-//            for(Shape shape: shapes) {
-//            	
-//            }
+            for(Shape shape: shapes) {
+            	graph2.setColor(Color.BLACK);
+            	graph2.draw(shape);
+            }
             
-            Shape rootRect = new Rectangle2D.Float(10, 10, 500, 400);
-            Shape line = new Line2D.Float(10, 10, 500, 400);
-            graph2.setColor(Color.BLACK);
-            graph2.draw(rootRect);
-            graph2.setColor(Color.GREEN);
-            graph2.draw(line);
-            
-        }
 
-//        private class DrawStuff extends JComponent{
-//
-//            @Override
-//            protected void paintComponent(Graphics g){
-//                super.paintComponent(g);
-//
-//                Graphics2D graph2 = (Graphics2D) g;
-//
-//                graph2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//
-////                for(Shape shape: shapes) {
-////                	
-////                }
-//                
-////                Shape rootRect = new Rectangle2D.Float(10, 10, 500, 400);
-////                Shape line = new Line2D.Float(10, 10, 500, 400);
-////                graph2.setColor(Color.BLACK);
-////                graph2.draw(rootRect);
-////                graph2.setColor(Color.GREEN);
-////                graph2.draw(line);
-//                
-//            }
-//        }
     }
+}
 }

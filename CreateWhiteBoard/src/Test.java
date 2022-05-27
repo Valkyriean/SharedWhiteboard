@@ -1,38 +1,27 @@
-import javax.swing.JFrame;
-import javax.swing.JEditorPane;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
-public class Test {
+public class Test extends JFrame {
 
-	private JFrame frame;
-	public Test() {
-		frame = new JFrame();
-		frame.getContentPane().setBackground(Color.PINK);
-		
-		JPanel panel = new JPanel();
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(164)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(174, Short.MAX_VALUE))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(85)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(94, Short.MAX_VALUE))
-		);
-		frame.getContentPane().setLayout(groupLayout);
-		// TODO Auto-generated constructor stub
-	}
-	
-	
-	private class 
+    public Test() {
+        setTitle("Drawing a Circle");
+        setSize(250, 250);
+        setVisible(true);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Shape circleShape = new Ellipse2D.Double(100, 100, 100, 100);
+        g2d.draw(circleShape);
+    }
+
+    public static void main(String[] args) {
+
+        new Test();
+
+    }
 }

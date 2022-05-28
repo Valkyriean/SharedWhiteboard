@@ -13,8 +13,19 @@ public class Circle implements Drawable{
 		this.c = c;
 	}
 
+	public Circle(String[] s) {
+		this.x = Integer.parseInt(s[1]);
+		this.y = Integer.parseInt(s[2]);
+		this.r = Integer.parseInt(s[3]);
+		this.c = new Color(Integer.parseInt(s[4]));
+	}
+	
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(this.c);
 		g2d.drawOval(this.x, this.y, this.r*2, this.r*2);
+	}
+	
+	public String toString() {
+		return String.format("Circle,%d,%d,%d,%d", x,y,r,c.getRGB());
 	}
 }

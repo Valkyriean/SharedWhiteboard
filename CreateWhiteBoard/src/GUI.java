@@ -11,8 +11,12 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -30,9 +34,11 @@ import javax.swing.AbstractListModel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.event.MenuKeyListener;
 import javax.swing.event.MenuKeyEvent;
+import java.awt.Font;
 
 public class GUI extends JFrame{
 
@@ -41,39 +47,52 @@ public class GUI extends JFrame{
 
     }
     
-    private String state;
+    private String state, filePath;
     private int preX,preY,preX1,preY1;
     private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
     private Color currentColor;
     
 
     
-    JTextArea status = new JTextArea();
+    private JLabel status = new JLabel();
     private JTextField textInput;
     private JTextField chatInput;
     
     public GUI(){
     	this.state="null";
+    	this.filePath=null;
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
         this.setTitle("Distributed Shared White Board Manager");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.currentColor = Color.black;
+        JButton colorButton = new JButton("Color");
+        colorButton.setToolTipText("Click to select color, displying selected color");
+        colorButton.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+        colorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	currentColor = JColorChooser.showDialog(null, "Select color", Color.white);
+            	colorButton.setForeground(currentColor);
+        	}
+        });
         
-        JButton line = new JButton("Line");
-        JButton circle = new JButton("Circle");
-        JButton triangle = new JButton("Triangle");
-        JButton rectangle = new JButton("Rectangle");
-        JButton text = new JButton("Text");
-        JButton cancel = new JButton("Cancel");
+        
+        
+        
+        
+        
+        
+        
         
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
         panel.setBackground(Color.WHITE);
         
         
-        status.setText("Plase select the color above and shape on left");
-                
+        status.setText("Plase select the color and shape on left");
+        
+        JButton line = new JButton("Line");
         line.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,6 +100,7 @@ public class GUI extends JFrame{
         		status.setText("Line selected, click on canves at where you want line start from.");
         	}
         });
+        JButton circle = new JButton("Circle");
         circle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,7 +108,7 @@ public class GUI extends JFrame{
         		status.setText("Circle selected, click on canves at where you want center of the circle be.");
         	}
         });
-        
+        JButton triangle = new JButton("Triangle");
         triangle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,7 +116,15 @@ public class GUI extends JFrame{
         		status.setText("Triangle selected, click on canves at where you want first point be.");
         	}
         });
-        
+        JButton rectangle = new JButton("Rectangle");
+        rectangle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+        		state = "rectangle_1";
+        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
+        	}
+        });
+        JButton text = new JButton("Text");
         rectangle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,18 +133,10 @@ public class GUI extends JFrame{
         	}
         });
         
-        rectangle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-        		state = "rectangle_1";
-        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
-        	}
-        });
-        
+        // Text button
         textInput = new JTextField();
         textInput.setText("Put text here");
-        textInput.setColumns(10);
-        
+        textInput.setColumns(100);
         text.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,6 +145,8 @@ public class GUI extends JFrame{
         	}
         });
         
+        JButton cancel = new JButton("Cancel");
+        cancel.setToolTipText("Abort action and reselect shape");
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -134,13 +156,17 @@ public class GUI extends JFrame{
         });
         
         JTextPane chatPane = new JTextPane();
+        chatPane.setToolTipText("Chat Box");
+        chatPane.setEditable(false);
         
         chatInput = new JTextField();
-        chatInput.setText("Input chat here");
-        chatInput.setColumns(10);
+        chatInput.setToolTipText("Input chat here");
+        chatInput.setColumns(20);
         
         JButton chatSendButton = new JButton("Send");
-        JLabel currentColorLabel = new JLabel("CurrentColor: Black");
+        
+        JLabel chatLabel = new JLabel("Chat");
+        
         
         
 
@@ -154,43 +180,37 @@ public class GUI extends JFrame{
         	groupLayout.createParallelGroup(Alignment.TRAILING)
         		.addGroup(groupLayout.createSequentialGroup()
         			.addContainerGap()
+        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        				.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(circle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(line, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(text, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        				.addComponent(textInput, 0, 0, Short.MAX_VALUE))
+        			.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
         			.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-        				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-        					.addGap(1)
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        						.addComponent(rectangle)
-        						.addComponent(triangle, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(circle, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(line, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(text, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(textInput, GroupLayout.PREFERRED_SIZE, 151, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(cancel, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)))
-        				.addComponent(currentColorLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        				.addComponent(chatInput, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+        				.addComponent(chatSendButton)
+        				.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+        				.addComponent(status, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addComponent(status, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-        				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
-        			.addGap(18)
-        			.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-        				.addGroup(groupLayout.createSequentialGroup()
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        						.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))
-        					.addGap(14))
-        				.addGroup(groupLayout.createSequentialGroup()
-        					.addComponent(chatSendButton)
-        					.addGap(27))))
+        				.addComponent(chatLabel)
+        				.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
+        			.addGap(14))
         );
         groupLayout.setVerticalGroup(
         	groupLayout.createParallelGroup(Alignment.LEADING)
         		.addGroup(groupLayout.createSequentialGroup()
         			.addGap(9)
-        			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-        				.addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        				.addComponent(currentColorLabel))
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         				.addGroup(groupLayout.createSequentialGroup()
+        					.addComponent(status)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addComponent(colorButton)
+        					.addGap(9)
         					.addComponent(line)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(circle)
@@ -204,16 +224,17 @@ public class GUI extends JFrame{
         					.addComponent(text)
         					.addPreferredGap(ComponentPlacement.RELATED)
         					.addComponent(cancel))
-        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        					.addGroup(groupLayout.createSequentialGroup()
-        						.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 289, GroupLayout.PREFERRED_SIZE)
-        						.addPreferredGap(ComponentPlacement.UNRELATED)
-        						.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addPreferredGap(ComponentPlacement.RELATED)
-        						.addComponent(chatSendButton)
-        						.addGap(0, 0, Short.MAX_VALUE))
-        					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)))
-        			.addGap(148))
+        				.addGroup(groupLayout.createSequentialGroup()
+        					.addComponent(chatLabel)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        						.addComponent(chatPane)
+        						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
+        					.addGap(26)
+        					.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        					.addGap(27)
+        					.addComponent(chatSendButton)))
+        			.addContainerGap(20, Short.MAX_VALUE))
         );
         getContentPane().setLayout(groupLayout);
         
@@ -223,23 +244,39 @@ public class GUI extends JFrame{
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
         
-        JMenuItem NewMI = new JMenuItem("New");
+        JMenuItem NewMI = new JMenuItem(new AbstractAction("New") {
+            public void actionPerformed(ActionEvent e) {
+            	shapes = new ArrayList<Drawable>();	            	
+            	repaint();
+            }
+        });
         fileMenu.add(NewMI);
         
-        JMenuItem mntmNewMenuItem_1 = new JMenuItem("New menu item");
-        fileMenu.add(mntmNewMenuItem_1);
+        JMenuItem openMi = new JMenuItem(new AbstractAction("Open") {
+            public void actionPerformed(ActionEvent e) {
+            	open();
+            	repaint();
+            }
+        });
+        fileMenu.add(openMi);
         
-        JMenuItem mntmNewMenuItem_2 = new JMenuItem("New menu item");
-        fileMenu.add(mntmNewMenuItem_2);
+        JMenuItem saveMI = new JMenuItem(new AbstractAction("Save") {
+            public void actionPerformed(ActionEvent e) {
+            	save();
+            }
+        });
+        fileMenu.add(saveMI);
         
-        JMenuItem mntmNewMenuItem_3 = new JMenuItem("New menu item");
-        fileMenu.add(mntmNewMenuItem_3);
+        JMenuItem saveAsMI = new JMenuItem(new AbstractAction("SaveAs") {
+            public void actionPerformed(ActionEvent e) {
+            	saveAs();
+            }
+        });
+        fileMenu.add(saveAsMI);
         
+        JMenuItem closeMI = new JMenuItem("Close");
         
-        
-
-        
-        colorMenu(menuBar, currentColorLabel);
+        fileMenu.add(closeMI);
         
         
         JMenu kickUserMenu = new JMenu("Kick User");
@@ -251,141 +288,6 @@ public class GUI extends JFrame{
 
     }
 
-    
-    private void colorMenu(JMenuBar menuBar, JLabel currentColorLabel) {
-    	// Color menu
-    	
-        JMenu colorMenu = new JMenu("Color");
-        menuBar.add(colorMenu);
-        // Black
-        JMenuItem blackColorMI = new JMenuItem(new AbstractAction("Black") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.black;
-        		currentColorLabel.setText("CurrentColor: Black");
-            }
-        });
-        // Blue
-        colorMenu.add(blackColorMI);        
-        JMenuItem blueColorMI = new JMenuItem(new AbstractAction("Blue") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.blue;
-        		currentColorLabel.setText("CurrentColor: Blue");
-            }
-        });
-        colorMenu.add(blueColorMI);
-        // Cyan
-        JMenuItem cyanColorMI = new JMenuItem(new AbstractAction("Cyan") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.cyan;
-        		currentColorLabel.setText("CurrentColor: Cyan");
-            }
-        });
-        colorMenu.add(cyanColorMI);
-        // Dark Gray
-        JMenuItem darkGrayColorMI = new JMenuItem(new AbstractAction("Dark Gray") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.darkGray;
-        		currentColorLabel.setText("CurrentColor: Dark Gray");
-            }
-        });
-        colorMenu.add(darkGrayColorMI);
-        // Gray
-        JMenuItem grayColorMI = new JMenuItem(new AbstractAction("Gray") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.gray;
-        		currentColorLabel.setText("CurrentColor: Gray");
-            }
-        });
-        colorMenu.add(grayColorMI);
-        // Green
-        JMenuItem greenColorMI = new JMenuItem(new AbstractAction("Green") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.green;
-        		currentColorLabel.setText("CurrentColor: Green");
-            }
-        });
-        colorMenu.add(greenColorMI);
-        // Indigo
-        JMenuItem indigoColorMI = new JMenuItem(new AbstractAction("Indigo") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = new Color(75,0,130);
-        		currentColorLabel.setText("CurrentColor: Indigo");
-            }
-        });
-        colorMenu.add(indigoColorMI);
-        // Light Gray
-        JMenuItem lightGrayColorMI = new JMenuItem(new AbstractAction("Light Gray") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.lightGray;
-        		currentColorLabel.setText("CurrentColor: Light Gray");
-            }
-        });
-        colorMenu.add(lightGrayColorMI);
-        // Magenta
-        JMenuItem magentaColorMI = new JMenuItem(new AbstractAction("Magenta") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.magenta;
-        		currentColorLabel.setText("CurrentColor: Magenta");
-            }
-        });
-        colorMenu.add(magentaColorMI);
-        // Navy
-        JMenuItem navyColorMI = new JMenuItem(new AbstractAction("Navy") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = new Color(0,0,128);
-        		currentColorLabel.setText("CurrentColor: Navy");
-            }
-        });
-        colorMenu.add(navyColorMI);
-        // Orange
-        JMenuItem orangeColorMI = new JMenuItem(new AbstractAction("Orange") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.orange;
-        		currentColorLabel.setText("CurrentColor: Orange");
-            }
-        });
-        colorMenu.add(orangeColorMI);
-        // Pink
-        JMenuItem pinkColorMI = new JMenuItem(new AbstractAction("Pink") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.pink;
-        		currentColorLabel.setText("CurrentColor: Pink");
-            }
-        });
-        colorMenu.add(pinkColorMI);
-        // Red
-        JMenuItem redColorMI = new JMenuItem(new AbstractAction("Red") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.red;
-        		currentColorLabel.setText("CurrentColor: Red");
-            }
-        });
-        colorMenu.add(redColorMI);
-        // Teal
-        JMenuItem tealColorMI = new JMenuItem(new AbstractAction("Teal") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = new Color(0,128,128);
-        		currentColorLabel.setText("CurrentColor: Teal");
-            }
-        });
-        colorMenu.add(tealColorMI);
-        // White
-        JMenuItem whiteColorMI = new JMenuItem(new AbstractAction("White") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.white;
-        		currentColorLabel.setText("CurrentColor: White");
-            }
-        });
-        colorMenu.add(whiteColorMI);
-        // Yellow
-        JMenuItem yellowColorMI = new JMenuItem(new AbstractAction("Yellow") {
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = Color.yellow;
-        		currentColorLabel.setText("CurrentColor: Yellow");
-            }
-        });
-        colorMenu.add(yellowColorMI);
-    }
     
     public class GraphicsPanel extends JPanel {
 
@@ -411,6 +313,8 @@ public class GUI extends JFrame{
             }
         }
     }
+    
+    
     private void click(int x, int y) {
     	System.out.println(x);
     	System.out.println(y);
@@ -475,5 +379,36 @@ public class GUI extends JFrame{
     		break;
     	
     	}
+    }
+    
+    private void save() {
+    	if (filePath == null) {
+    		saveAs();
+    	}else {
+    		FileManager.save(filePath, shapes);
+    	}
+    }
+    
+    private void saveAs() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Specify a file to save");   
+		int userSelection = fileChooser.showSaveDialog(this); 
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+		    File fileToSave = fileChooser.getSelectedFile();
+		    FileManager.save(fileToSave.getAbsolutePath(), shapes);
+		    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+		}
+    }
+    
+    private void open() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Specify a file to open");   
+		int userSelection = fileChooser.showOpenDialog(this); 
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+		    File fileToOpen = fileChooser.getSelectedFile();
+		    this.shapes = FileManager.open(fileToOpen);
+		    this.filePath = fileToOpen.getAbsolutePath();	
+		    System.out.println("Open as file: " + fileToOpen.getAbsolutePath());
+		}
     }
 }

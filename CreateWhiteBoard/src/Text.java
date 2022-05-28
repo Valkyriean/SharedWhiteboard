@@ -12,12 +12,23 @@ public class Text implements Drawable{
 		this.y = y;
 		this.text = text;
 		this.c = c;
-		// TODO Auto-generated constructor stub
+	}
+	
+	public Text(String[] s) {
+		this.x = Integer.parseInt(s[1]);
+		this.y = Integer.parseInt(s[2]);
+		this.c = new Color(Integer.parseInt(s[3]));
+		this.text = s[4];
 	}
 	
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(this.c);
 		g2d.drawString(text, x, y);;
+	}
+	
+	public String toString() {
+		// split(",",5)
+		return String.format("Text,%d,%d,%d,%s", x,y,c.getRGB(),text);
 	}
 
 }

@@ -4,11 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
@@ -28,6 +24,11 @@ import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.JEditorPane;
 
 public class GUI extends JFrame{
 
@@ -41,66 +42,90 @@ public class GUI extends JFrame{
 
     }
     private String state;
-    private int tempx,tempy;
-    private ArrayList<Shape> shapes = new ArrayList<Shape>();
+    private int preX,preY,preX1,preY1;
+    private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
+    private Color currentColor;
     
     private void click(int x, int y) {
     	System.out.println(x);
     	System.out.println(y);
     	System.out.println(state);
     	System.out.println(shapes);
-    	if(state=="line_start") {
-    		this.tempx=x;
-    		this.tempy=y;
-    		state = "line_end";
+    	switch (state) {
+    	case "line_1":
+    		this.preX=x;
+    		this.preY=y;
+    		state = "line_2";
     		status.setText("Now, click on canvas at where you want line end.");
-    	}else if(state =="line_end") {
-    		shapes.add(new Line2D.Double(tempx, tempy, x, y));
+    		break;
+    	case "line_2":
+    		shapes.add(new Line(preX, preY, x, y, currentColor));
     		state="null";
     		status.setText("Plase select the shape you want at left");
-    	}
-    	else if(state=="rec_start") {
-    		this.tempx=x;
-    		this.tempy=y;
-    		state = "rec_end";
+    		break;
+    	case "circle_1":
+    		this.preX=x;
+    		this.preY=y;
+    		state = "circle_2";
+    		status.setText("Now, click on canvas at where you want circle go through.");
+    		break;
+    	case "circle_2":
+    		shapes.add(new Circle(preX, preY, x, y, currentColor));
+    		state="null";
+    		status.setText("Plase select the shape you want at left");
+    		break;
+    	case "triangle_1":
+    		System.out.println("ta1");
+    		this.preX=x;
+    		this.preY=y;
+    		state = "triangle_2";
+    		status.setText("Now, click on canvas at where you want second point be.");
+    		break;
+    	case "triangle_2":
+    		this.preX1=x;
+    		this.preY1=y;
+    		state = "triangle_3";
+    		status.setText("Now, click on canvas at where you want third point be.");
+    		break;
+    	case "triangle_3":
+    		shapes.add(new Triangle(preX, preY, preX1, preY1, x, y, currentColor));
+    		state="null";
+    		status.setText("Plase select the shape you want at left");
+    		break;
+    	case "rectangle_1":
+    		this.preX=x;
+    		this.preY=y;
+    		state = "rectangle_2";
     		status.setText("Now, click on canvas at where you want bottom right be.");
-
-    	}else if(state =="rec_end") {
-    		shapes.add(new Rectangle(tempx, tempy, x-tempx, y-tempy));
+    		break;
+    	case "rectangle_2":
+    		shapes.add(new Rectangle(preX, preY, x, y, currentColor));
     		state="null";
     		status.setText("Plase select the shape you want at left");
     	}
-    	else if(state=="circle_start") {
-    		this.tempx=x;
-    		this.tempy=y;
-    		state = "rec_end";
-    		status.setText("Now, click on canvas at where you want bottom right be.");
-
-    	}else if(state =="rec_end") {
-    		shapes.add(new Rectangle(tempx, tempy, x-tempx, y-tempy));
-    		state="null";
-    		status.setText("Plase select the shape you want at left");
-    	}
-
+    	
     }
     
     JTextArea status = new JTextArea();
+    private JTextField textInput;
+    private JTextField chatInput;
     
     public GUI(){
     	this.state="null";
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
-        this.setTitle("Drawing tings");
+        this.setTitle("Distributed Shared White Board Manager");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.currentColor = Color.black;
         
         JButton line = new JButton("Line");
-        JButton triangle = new JButton("Triangle");
         JButton circle = new JButton("Circle");
+        JButton triangle = new JButton("Triangle");
         JButton rectangle = new JButton("Rectangle");
-
+        JButton text = new JButton("Text");
         
-        JComponent panel = new GraphicsPanel();
-//        JComponent panel = new JPanel();
+//        JComponent panel = new GraphicsPanel();
+        JComponent panel = new JPanel();
         panel.setBackground(Color.WHITE);
         
         
@@ -109,20 +134,58 @@ public class GUI extends JFrame{
         line.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		state = "line_start";
+        		state = "line_1";
         		status.setText("Line selected, click on canves at where you want line start from.");
+        	}
+        });
+        circle.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		state = "circle_1";
+        		status.setText("Circle selected, click on canves at where you want center of the circle be.");
+        	}
+        });
+        
+        triangle.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		state = "triangle_1";
+        		status.setText("Triangle selected, click on canves at where you want first point be.");
         	}
         });
         
         rectangle.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		state = "rec_start";
+        		state = "rectangle_1";
         		status.setText("Rectangle selected, click on canves at where you want top left point be.");
         	}
         });
         
+        rectangle.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		state = "rectangle_1";
+        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
+        	}
+        });
+        
+        textInput = new JTextField();
+        textInput.setText("Put text here");
+        textInput.setColumns(10);
+        
+        JTextPane chatPane = new JTextPane();
+        
+        chatInput = new JTextField();
+        chatInput.setText("Input chat here");
+        chatInput.setColumns(10);
+        
+        JButton chatSendButton = new JButton("Send");
+        
+        
 
+        
+        
 
         
         GroupLayout groupLayout = new GroupLayout(getContentPane());
@@ -131,15 +194,34 @@ public class GUI extends JFrame{
         		.addGroup(groupLayout.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-        				.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-        				.addComponent(circle, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-        				.addComponent(line, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
-        			.addGap(53)
+        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        					.addGroup(groupLayout.createSequentialGroup()
+        						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        							.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        							.addComponent(circle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        							.addComponent(line, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
+        						.addGap(53))
+        					.addGroup(groupLayout.createSequentialGroup()
+        						.addComponent(text, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+        						.addPreferredGap(ComponentPlacement.RELATED)))
+        				.addGroup(groupLayout.createSequentialGroup()
+        					.addComponent(textInput, GroupLayout.PREFERRED_SIZE, 151, GroupLayout.PREFERRED_SIZE)
+        					.addPreferredGap(ComponentPlacement.RELATED)))
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        				.addComponent(status)
+        				.addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
-        			.addGap(136))
+        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        				.addGroup(groupLayout.createSequentialGroup()
+        					.addGap(18)
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        						.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE))
+        					.addGap(14))
+        				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+        					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(chatSendButton)
+        					.addGap(27))))
         );
         groupLayout.setVerticalGroup(
         	groupLayout.createParallelGroup(Alignment.LEADING)
@@ -153,12 +235,23 @@ public class GUI extends JFrame{
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(triangle)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(rectangle))
+        					.addComponent(rectangle)
+        					.addGap(18)
+        					.addComponent(textInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        					.addGap(15)
+        					.addComponent(text))
         				.addGroup(groupLayout.createSequentialGroup()
         					.addGap(9)
         					.addComponent(status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 365, GroupLayout.PREFERRED_SIZE)))
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        						.addGroup(groupLayout.createSequentialGroup()
+        							.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 289, GroupLayout.PREFERRED_SIZE)
+        							.addPreferredGap(ComponentPlacement.UNRELATED)
+        							.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(chatSendButton))
+        						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 365, GroupLayout.PREFERRED_SIZE))))
         			.addContainerGap(148, Short.MAX_VALUE))
         );
         getContentPane().setLayout(groupLayout);
@@ -166,28 +259,30 @@ public class GUI extends JFrame{
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         
-        JMenu mnNewMenu = new JMenu("New menu");
-        menuBar.add(mnNewMenu);
+        JMenu FileMenu = new JMenu("File");
+        menuBar.add(FileMenu);
         
-        JMenuItem mntmNewMenuItem = new JMenuItem("New menu item");
-        mnNewMenu.add(mntmNewMenuItem);
+        JMenuItem NewMI = new JMenuItem("New");
+        FileMenu.add(NewMI);
         
         JMenuItem mntmNewMenuItem_1 = new JMenuItem("New menu item");
-        mnNewMenu.add(mntmNewMenuItem_1);
+        FileMenu.add(mntmNewMenuItem_1);
         
         JMenuItem mntmNewMenuItem_2 = new JMenuItem("New menu item");
-        mnNewMenu.add(mntmNewMenuItem_2);
+        FileMenu.add(mntmNewMenuItem_2);
         
         JMenuItem mntmNewMenuItem_3 = new JMenuItem("New menu item");
-        mnNewMenu.add(mntmNewMenuItem_3);
+        FileMenu.add(mntmNewMenuItem_3);
+        
+        JMenu mnNewMenu = new JMenu("Color");
+        menuBar.add(mnNewMenu);
+        
+        JMenu mnNewMenu_1 = new JMenu("Kick User");
+        menuBar.add(mnNewMenu_1);
       
         
         this.setVisible(true);
-        
-        Shape rootRect = new Rectangle(30, 50, 420, 120);
-        Shape rootline = new Line2D.Float(10, 10, 500, 400);
-        shapes.add(rootRect);
-        shapes.add(rootline);
+
 
     }
 
@@ -210,13 +305,12 @@ public class GUI extends JFrame{
         public void paint(Graphics g){
             super.paint(g);
 
-            Graphics2D graph2 = (Graphics2D) g;
+            Graphics2D g2d = (Graphics2D) g;
 
-            graph2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            for(Shape shape: shapes) {
-            	graph2.setColor(Color.BLACK);
-            	graph2.draw(shape);
+            for(Drawable shape: shapes) {
+            	shape.draw(g2d);
             }
             
 

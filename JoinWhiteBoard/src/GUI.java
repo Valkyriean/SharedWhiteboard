@@ -31,7 +31,10 @@ import java.awt.Font;
 
 public class GUI extends JFrame{
 
-    
+    public static void main(String[] args) {
+        new GUI();
+
+    }
     
     private String state, filePath;
     private int preX,preY,preX1,preY1;

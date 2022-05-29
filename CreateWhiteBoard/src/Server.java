@@ -12,7 +12,7 @@ public class Server {
 	private static ArrayList<User> users = new ArrayList<User>();
 	private static GUI gui = null;
 	private static boolean running = true;
-	private static String username;
+	public static String username;
 	public static void main(String[] args) {
 		String serverIp;
 		int serverPort;
@@ -112,6 +112,10 @@ public class Server {
 			getDraw(r[2]);
 			broadcastOthers(r[2], username);
 			break;
+		case "chat":
+			gui.addChat(r[1]);
+			broadcastChat(r[1]);
+			break;
 		}
 		client.close();
 	}
@@ -148,6 +152,10 @@ public class Server {
 			out.flush();
 			client.close();
 		}catch(Exception e) {
+			//User dropped
+//			users.remove(user);
+//			gui.updateKickList(users);
+//			broadcastUserList();
 			e.printStackTrace();
 		}
 	}
@@ -171,6 +179,7 @@ public class Server {
 			sendDraw(drawable, u);
 		}
 	}
+	
 	public static void broadcastNewFile() {
 		for(User user: users) {
 			try {
@@ -188,6 +197,7 @@ public class Server {
 			
 		}
 	}
+	
 	public static void kickUser(User user) {
 		try {
 			Socket client = new Socket(user.ip,user.port);
@@ -211,6 +221,7 @@ public class Server {
 	
 	public static void exit() {
 		broadcastHostClose();
+		gui.dispose();
 		System.exit(0);
 	}
 	
@@ -244,6 +255,22 @@ public class Server {
 				Socket client = new Socket(user.ip,user.port);
 				DataOutputStream out = new DataOutputStream(client.getOutputStream());
 				out.writeUTF("hostClose");
+				out.flush();
+				client.close();
+				sendAll(user);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void broadcastChat(String chat) {
+		for(User user: users) {
+			try {
+				Socket client = new Socket(user.ip,user.port);
+				DataOutputStream out = new DataOutputStream(client.getOutputStream());
+				out.writeUTF("chat<br>"+chat);
 				out.flush();
 				client.close();
 				sendAll(user);

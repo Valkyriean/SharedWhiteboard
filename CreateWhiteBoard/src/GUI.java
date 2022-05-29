@@ -30,6 +30,7 @@ import javax.swing.JTextPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import java.awt.Font;
+import javax.swing.JTextArea;
 
 public class GUI extends JFrame{
 
@@ -41,37 +42,23 @@ public class GUI extends JFrame{
     private Color currentColor;
     public JMenu kickUserMenu = new JMenu("Kick User");
 
-    
+    private JTextArea chatArea;
     private JLabel status = new JLabel();
     private JTextField chatInput;
     
     public GUI(){
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
-        this.setTitle("Distributed Shared White Board Manager");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Distributed Shared White Board Manager: "+Server.username);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
         this.currentColor = Color.black;
         JButton colorButton = new JButton("Color");
-        colorButton.setToolTipText("Click to select color, displying selected color");
-        colorButton.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-        colorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	currentColor = JColorChooser.showDialog(null, "Select color", Color.white);
-            	colorButton.setForeground(currentColor);
-        	}
-        });
-        
-        
-        
-        
-        
-        
-        
         
         
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
+        panel.setToolTipText("Draw area");
         
         
         
@@ -81,6 +68,16 @@ public class GUI extends JFrame{
         
         
         status.setText("Plase select the color and shape on left");
+        
+        colorButton.setToolTipText("Click to select color, displying selected color");
+        colorButton.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+        colorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	currentColor = JColorChooser.showDialog(null, "Select color", currentColor);
+            	colorButton.setForeground(currentColor);
+        	}
+        });
         
         JButton line = new JButton("Line");
         line.addActionListener(new ActionListener() {
@@ -115,13 +112,6 @@ public class GUI extends JFrame{
         	}
         });
         JButton text = new JButton("Text");
-        rectangle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-        		state = "rectangle_1";
-        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
-        	}
-        });
         text.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -143,21 +133,41 @@ public class GUI extends JFrame{
         	}
         });
         
-        JTextPane chatPane = new JTextPane();
-        chatPane.setToolTipText("Chat Box");
-        chatPane.setEditable(false);
+        
+        
         
         chatInput = new JTextField();
         chatInput.setToolTipText("Input chat here");
         chatInput.setColumns(20);
         
-        JButton chatSendButton = new JButton("Send");
+        
         
         JLabel chatLabel = new JLabel("Chat");
         
+        chatArea = new JTextArea();
+        chatArea.setToolTipText("Chat Box");
+        chatArea.setWrapStyleWord(true);
+        chatArea.setEditable(false);
         
         
-
+        JButton chatSendButton = new JButton("Send");
+        chatSendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String chat = Server.username+":"+chatInput.getText();
+            	System.out.println(chat);
+            	if(chat!= null && chat.length()>0) {
+            		int max = 19;
+            		while (chat.length()>max) {
+            			chat = chat.substring(0, max) + "\n" + chat.substring(max);
+            			max+=19;
+            		}
+            		chatArea.setText(chatArea.getText()+chat+"\n");
+            		chatInput.setText("");
+            		Server.broadcastChat(chat);
+            	}
+        	}
+        });
         
         
         
@@ -169,26 +179,34 @@ public class GUI extends JFrame{
         		.addGroup(groupLayout.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        					.addComponent(circle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(line, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        					.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
-        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        					.addComponent(text, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)))
-        			.addGap(21)
-        			.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-        				.addComponent(chatInput, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-        				.addComponent(chatSendButton)
-        				.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-        				.addComponent(status, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addComponent(chatLabel)
-        				.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
-        			.addGap(14))
+        				.addGroup(groupLayout.createSequentialGroup()
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        							.addComponent(circle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(line, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        							.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
+        						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        							.addComponent(text, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        							.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)))
+        					.addGap(21)
+        					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+        						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+        						.addComponent(status, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE))
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        						.addGroup(groupLayout.createSequentialGroup()
+        							.addGap(6)
+        							.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE))
+        						.addGroup(groupLayout.createSequentialGroup()
+        							.addGap(12)
+        							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        								.addComponent(chatLabel)
+        								.addComponent(chatArea))))
+        					.addGap(15))
+        				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+        					.addComponent(chatSendButton)
+        					.addGap(23))))
         );
         groupLayout.setVerticalGroup(
         	groupLayout.createParallelGroup(Alignment.LEADING)
@@ -196,7 +214,9 @@ public class GUI extends JFrame{
         			.addGap(9)
         			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         				.addGroup(groupLayout.createSequentialGroup()
-        					.addComponent(status)
+        					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(status)
+        						.addComponent(chatLabel))
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(colorButton)
         					.addGap(3)
@@ -212,16 +232,15 @@ public class GUI extends JFrame{
         					.addGap(83)
         					.addComponent(cancel))
         				.addGroup(groupLayout.createSequentialGroup()
-        					.addComponent(chatLabel)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        						.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
-        					.addGap(26)
-        					.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addGap(27)
-        					.addComponent(chatSendButton)))
-        			.addContainerGap(20, Short.MAX_VALUE))
+        					.addGap(28)
+        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        						.addComponent(chatArea)
+        						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))))
+        			.addGap(18)
+        			.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        			.addGap(18)
+        			.addComponent(chatSendButton)
+        			.addGap(37))
         );
         getContentPane().setLayout(groupLayout);
         
@@ -433,9 +452,10 @@ public class GUI extends JFrame{
     	else if(answer == 0) {
     		save();
     	}
-    	Server.kickAll();
     	Server.exit();
-    	this.dispose();
     }
     
+    public void addChat(String chat) {
+    	chatArea.setText(chatArea.getText()+chat+"\n");
+    }
 }

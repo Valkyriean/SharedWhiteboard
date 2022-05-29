@@ -15,7 +15,7 @@ public class Client {
 	private static boolean running = true;
 	private static String serverIp;
 	private static int serverPort;
-	private static String username;
+	public static String username;
 	
 	public static void main(String[] args) {
 		
@@ -126,6 +126,8 @@ public class Client {
 				gui.dispose();
 				System.exit(0);
 				return;
+			case "chat":
+				gui.updateChat(r[1]);
 			}			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -151,7 +153,7 @@ public class Client {
 			DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 			output.writeUTF("exit<br>"+username);
 			output.flush();
-			output.close();
+			socket.close();
 			System.exit(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -181,4 +183,16 @@ public class Client {
         }
         gui.repaint();
 	}
+	
+	public static void sentChat(String chat) {
+		try {
+			Socket socket = new Socket(serverIp,serverPort);
+			DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+			output.writeUTF("chat<br>"+chat);
+			output.flush();
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
 }

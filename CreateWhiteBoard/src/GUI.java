@@ -37,9 +37,9 @@ public class GUI extends JFrame{
     
     private String state = null, filePath=null, tempText = null;
     private int preX,preY,preX1,preY1;
-    private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
+    public ArrayList<Drawable> shapes = new ArrayList<Drawable>();
     private Color currentColor;
-    
+    public JMenu kickUserMenu = new JMenu("Kick User");
 
     
     private JLabel status = new JLabel();
@@ -242,7 +242,7 @@ public class GUI extends JFrame{
         JMenuItem openMi = new JMenuItem(new AbstractAction("Open") {
             public void actionPerformed(ActionEvent e) {
             	open();
-            	repaint();
+            	
             }
         });
         fileMenu.add(openMi);
@@ -261,12 +261,16 @@ public class GUI extends JFrame{
         });
         fileMenu.add(saveAsMI);
         
-        JMenuItem closeMI = new JMenuItem("Close");
+        JMenuItem closeMI = new JMenuItem(new AbstractAction("Close") {
+            public void actionPerformed(ActionEvent e) {
+            	close();
+            }
+        });
         
         fileMenu.add(closeMI);
         
         
-        JMenu kickUserMenu = new JMenu("Kick User");
+        
         menuBar.add(kickUserMenu);
       
         
@@ -301,10 +305,10 @@ public class GUI extends JFrame{
     
     
     private void click(int x, int y) {
-    	System.out.println(x);
-    	System.out.println(y);
-    	System.out.println(state);
-    	System.out.println(shapes);
+//    	System.out.println(x);
+//    	System.out.println(y);
+//    	System.out.println(state);
+//    	System.out.println(shapes);
     	switch (state) {
     	case "line_1":
     		this.preX=x;
@@ -313,7 +317,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want line end.");
     		break;
     	case "line_2":
-    		shapes.add(new Line(preX, preY, x, y, currentColor));
+    		Drawable l = new Line(preX, preY, x, y, currentColor);
+    		shapes.add(l);
+    		Server.broadcastDraw(l.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -324,7 +330,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want circle go through.");
     		break;
     	case "circle_2":
-    		shapes.add(new Circle(preX, preY, x, y, currentColor));
+    		Drawable c = new Circle(preX, preY, x, y, currentColor);
+    		shapes.add(c);
+    		Server.broadcastDraw(c.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -342,7 +350,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want third point be.");
     		break;
     	case "triangle_3":
-    		shapes.add(new Triangle(preX, preY, preX1, preY1, x, y, currentColor));
+    		Drawable t = new Triangle(preX, preY, preX1, preY1, x, y, currentColor);
+    		shapes.add(t);
+    		Server.broadcastDraw(t.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -353,12 +363,16 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want bottom right be.");
     		break;
     	case "rectangle_2":
-    		shapes.add(new Rectangle(preX, preY, x, y, currentColor));
+    		Drawable r = new Rectangle(preX, preY, x, y, currentColor);
+    		shapes.add(r);
+    		Server.broadcastDraw(r.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
     	case "text_1":
-    		shapes.add(new Text(x, y,tempText,currentColor));
+    		Drawable te = new Text(x, y,tempText,currentColor);
+    		shapes.add(te);
+    		Server.broadcastDraw(te.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -392,8 +406,36 @@ public class GUI extends JFrame{
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    File fileToOpen = fileChooser.getSelectedFile();
 		    this.shapes = FileManager.open(fileToOpen);
-		    this.filePath = fileToOpen.getAbsolutePath();	
+		    repaint();
+		    this.filePath = fileToOpen.getAbsolutePath();
+		    Server.broadcastNewFile();
 		    System.out.println("Open as file: " + fileToOpen.getAbsolutePath());
 		}
     }
+    
+    public void updateKickList(ArrayList<User> users) {
+    	kickUserMenu.removeAll();
+    	for(User user: users) {
+    		JMenuItem kickUserMI = new JMenuItem(new AbstractAction(user.username) {
+                public void actionPerformed(ActionEvent e) {
+                	Server.kickUser(user);
+                }
+            });
+    		kickUserMenu.add(kickUserMI);
+    	}
+    }
+    
+    private void close() {
+    	int answer = JOptionPane.showConfirmDialog(null, "Do you want to save before close?");
+    	if (answer == 2) {
+    		return;
+    	} 
+    	else if(answer == 0) {
+    		save();
+    	}
+    	Server.kickAll();
+    	Server.exit();
+    	this.dispose();
+    }
+    
 }

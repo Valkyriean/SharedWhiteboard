@@ -37,18 +37,18 @@ public class GUI extends JFrame{
     
     private String state = null, filePath=null, tempText = null;
     private int preX,preY,preX1,preY1;
-    private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
+    public ArrayList<Drawable> shapes = new ArrayList<Drawable>();
     private Color currentColor;
     
 
     
     private JLabel status = new JLabel();
     private JTextField chatInput;
-    
+    private JMenu userListMenu;
     public GUI(){
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
-        this.setTitle("Distributed Shared White Board Manager");
+        this.setTitle("Distributed Shared White Board User");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.currentColor = Color.black;
         JButton colorButton = new JButton("Color");
@@ -230,23 +230,7 @@ public class GUI extends JFrame{
         
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
-        
-        JMenuItem NewMI = new JMenuItem(new AbstractAction("New") {
-            public void actionPerformed(ActionEvent e) {
-            	shapes = new ArrayList<Drawable>();	            	
-            	repaint();
-            }
-        });
-        fileMenu.add(NewMI);
-        
-        JMenuItem openMi = new JMenuItem(new AbstractAction("Open") {
-            public void actionPerformed(ActionEvent e) {
-            	open();
-            	repaint();
-            }
-        });
-        fileMenu.add(openMi);
-        
+ 
         JMenuItem saveMI = new JMenuItem(new AbstractAction("Save") {
             public void actionPerformed(ActionEvent e) {
             	save();
@@ -261,13 +245,16 @@ public class GUI extends JFrame{
         });
         fileMenu.add(saveAsMI);
         
-        JMenuItem closeMI = new JMenuItem("Close");
-        
+        JMenuItem closeMI = new JMenuItem(new AbstractAction("Close") {
+            public void actionPerformed(ActionEvent e) {
+            	Client.exit();
+            }
+        });
         fileMenu.add(closeMI);
         
         
-        JMenu kickUserMenu = new JMenu("Kick User");
-        menuBar.add(kickUserMenu);
+        userListMenu = new JMenu("User List");
+        menuBar.add(userListMenu);
       
         
         this.setVisible(true);
@@ -303,10 +290,6 @@ public class GUI extends JFrame{
     
     
     private void click(int x, int y) {
-    	System.out.println(x);
-    	System.out.println(y);
-    	System.out.println(state);
-    	System.out.println(shapes);
     	switch (state) {
     	case "line_1":
     		this.preX=x;
@@ -315,7 +298,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want line end.");
     		break;
     	case "line_2":
-    		shapes.add(new Line(preX, preY, x, y, currentColor));
+    		Drawable l = new Line(preX, preY, x, y, currentColor);
+    		shapes.add(l);
+    		Client.postDraw(l.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -326,7 +311,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want circle go through.");
     		break;
     	case "circle_2":
-    		shapes.add(new Circle(preX, preY, x, y, currentColor));
+    		Drawable c = new Circle(preX, preY, x, y, currentColor);
+    		shapes.add(c);
+    		Client.postDraw(c.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -344,7 +331,9 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want third point be.");
     		break;
     	case "triangle_3":
-    		shapes.add(new Triangle(preX, preY, preX1, preY1, x, y, currentColor));
+    		Drawable t = new Triangle(preX, preY, preX1, preY1, x, y, currentColor);
+    		shapes.add(t);
+    		Client.postDraw(t.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -355,12 +344,16 @@ public class GUI extends JFrame{
     		status.setText("Now, click on canvas at where you want bottom right be.");
     		break;
     	case "rectangle_2":
-    		shapes.add(new Rectangle(preX, preY, x, y, currentColor));
+    		Drawable r = new Rectangle(preX, preY, x, y, currentColor);
+    		shapes.add(r);
+    		Client.postDraw(r.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
     	case "text_1":
-    		shapes.add(new Text(x, y,tempText,currentColor));
+    		Drawable te = new Text(x, y,tempText,currentColor);
+    		shapes.add(te);
+    		Client.postDraw(te.toString());
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
@@ -387,15 +380,15 @@ public class GUI extends JFrame{
 		}
     }
     
-    private void open() {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Specify a file to open");   
-		int userSelection = fileChooser.showOpenDialog(this); 
-		if (userSelection == JFileChooser.APPROVE_OPTION) {
-		    File fileToOpen = fileChooser.getSelectedFile();
-		    this.shapes = FileManager.open(fileToOpen);
-		    this.filePath = fileToOpen.getAbsolutePath();	
-		    System.out.println("Open as file: " + fileToOpen.getAbsolutePath());
-		}
+
+    public void updateUserList(String userList) {
+    	
+    	userListMenu.removeAll();
+    	String[] users = userList.split("<usrbr>");
+    	for(String user: users) {
+    		JMenuItem userMI = new JMenuItem(user);
+    		userListMenu.add(userMI);
+    	}
     }
+
 }

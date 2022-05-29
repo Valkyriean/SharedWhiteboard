@@ -27,7 +27,7 @@ public class Text implements Drawable{
 	}
 	
 	public String toString() {
-		// split(",",5)
+		// split(",",5) because text may contain comma
 		return String.format("Text,%d,%d,%d,%s", x,y,c.getRGB(),text);
 	}
 

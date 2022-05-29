@@ -10,7 +10,6 @@ public class Rectangle implements Drawable{
 		this.w = x2-x;
 		this.h = y2-y;
 		this.c = c;
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Rectangle(String[] s) {

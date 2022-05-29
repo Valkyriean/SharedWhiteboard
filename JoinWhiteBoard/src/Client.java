@@ -65,7 +65,7 @@ public class Client {
 				Socket client = listeningSocket.accept();
 				listen(client);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Error occur in listening port", e);
 			}
 		}
 		
@@ -103,7 +103,7 @@ public class Client {
 			DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 			output.writeUTF("joinRequest<br>"+username+"<br>"+listeningPort);
 			output.flush();
-			System.out.println("Join request sent, waiting for server reply");
+			logger.info("Join request sent, waiting for server reply");
 			String reply = input.readUTF();
 			socket.close();
 			switch (reply) {
@@ -164,7 +164,7 @@ public class Client {
 				return;
 			case "chat":
 				logger.info("Request to update chat "+r[1]);
-				gui.updateChat(r[1]);
+				gui.addChat(r[1]);
 			}			
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Error occur in processing request from server", e);

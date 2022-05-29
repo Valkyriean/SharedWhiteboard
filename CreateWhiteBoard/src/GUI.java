@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import java.awt.event.MouseAdapter;
@@ -33,10 +34,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextArea;
+import javax.swing.JScrollBar;
+import javax.swing.DropMode;
 
 public class GUI extends JFrame{
 	private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
-	private String state = null, filePath=null, tempText = null;
+	private String state = "null", filePath=null, tempText = null;
     private int preX,preY,preX1,preY1;
     private Color currentColor;
     private JLabel status; 
@@ -52,13 +55,16 @@ public class GUI extends JFrame{
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
+        panel.setBounds(132, 25, 466, 397);
         panel.setToolTipText("Draw area");
         panel.setBackground(Color.WHITE);
         status = new JLabel();
+        status.setBounds(132, 9, 466, 16);
         status.setText("Plase select the color and shape on left");
         // Drawing tool box
         // Color
         JButton colorButton = new JButton("Color");
+        colorButton.setBounds(5, 25, 105, 30);
         this.currentColor = Color.black;
         colorButton.setToolTipText("Click to select color, displying selected color");
         colorButton.setFont(new Font("Lucida Grande", Font.BOLD, 13));
@@ -71,6 +77,7 @@ public class GUI extends JFrame{
         });
         // Line
         JButton line = new JButton("Line");
+        line.setBounds(5, 75, 105, 30);
         line.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,6 +87,7 @@ public class GUI extends JFrame{
         });
         // Circle
         JButton circle = new JButton("Circle");
+        circle.setBounds(5, 125, 105, 30);
         circle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,6 +97,7 @@ public class GUI extends JFrame{
         });
         // Triangle
         JButton triangle = new JButton("Triangle");
+        triangle.setBounds(5, 175, 105, 30);
         triangle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -98,6 +107,7 @@ public class GUI extends JFrame{
         });
         // Rectangle
         JButton rectangle = new JButton("Rectangle");
+        rectangle.setBounds(5, 225, 105, 30);
         rectangle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,6 +117,7 @@ public class GUI extends JFrame{
         });
         // Text
         JButton text = new JButton("Text");
+        text.setBounds(5, 275, 105, 30);
         text.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,6 +130,7 @@ public class GUI extends JFrame{
         });
         // Cancel
         JButton cancel = new JButton("Cancel");
+        cancel.setBounds(5, 375, 105, 30);
         cancel.setToolTipText("Abort action and reselect shape");
         cancel.addActionListener(new ActionListener() {
             @Override
@@ -129,106 +141,57 @@ public class GUI extends JFrame{
         });
         // Chat
         JLabel chatLabel = new JLabel("Chat");
+        chatLabel.setBounds(610, 9, 29, 16);
         chatInput = new JTextField();
+        chatInput.setBounds(610, 440, 160, 26);
         chatInput.setToolTipText("Input chat here");
         chatInput.setColumns(20);
         chatArea = new JTextArea();
+        chatArea.setDropMode(DropMode.INSERT);
+        chatArea.setBounds(610, 25, 160, 400);
+        chatArea.setLineWrap(true);
         chatArea.setToolTipText("Chat Box");
         chatArea.setWrapStyleWord(true);
         chatArea.setEditable(false);
         JButton chatSendButton = new JButton("Send");
+        chatSendButton.setBounds(610, 485, 160, 30);
         chatSendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	String chat = Server.getUsername()+":"+chatInput.getText();
-            	System.out.println(chat);
+            	String chat = chatInput.getText();
+            	logger.info("Said "+chat);
             	if(chat!= null && chat.length()>0) {
+            		chat = Server.getUsername()+":"+chat;
             		int max = 19;
             		while (chat.length()>max) {
+            			logger.info("Chat too long, making new line");
             			chat = chat.substring(0, max) + "\n" + chat.substring(max);
             			max+=19;
             		}
-            		chatArea.setText(chatArea.getText()+chat+"\n");
+            		addChat(chat);
             		chatInput.setText("");
             		Server.broadcastChat(chat);
             	}
         	}
         });
-        //Layout
-        GroupLayout groupLayout = new GroupLayout(getContentPane());
-        groupLayout.setHorizontalGroup(
-        	groupLayout.createParallelGroup(Alignment.TRAILING)
-        		.addGroup(groupLayout.createSequentialGroup()
-        			.addContainerGap()
-        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(groupLayout.createSequentialGroup()
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        							.addComponent(circle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        							.addComponent(line, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        							.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        							.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
-        						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        							.addComponent(text, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        							.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        							.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)))
-        					.addGap(21)
-        					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
-        						.addComponent(status, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE))
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        						.addGroup(groupLayout.createSequentialGroup()
-        							.addGap(6)
-        							.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE))
-        						.addGroup(groupLayout.createSequentialGroup()
-        							.addGap(12)
-        							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        								.addComponent(chatLabel)
-        								.addComponent(chatArea))))
-        					.addGap(15))
-        				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-        					.addComponent(chatSendButton)
-        					.addGap(23))))
-        );
-        groupLayout.setVerticalGroup(
-        	groupLayout.createParallelGroup(Alignment.LEADING)
-        		.addGroup(groupLayout.createSequentialGroup()
-        			.addGap(9)
-        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(groupLayout.createSequentialGroup()
-        					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-        						.addComponent(status)
-        						.addComponent(chatLabel))
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(colorButton)
-        					.addGap(3)
-        					.addComponent(line)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(circle)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(triangle)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(rectangle)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(text)
-        					.addGap(83)
-        					.addComponent(cancel))
-        				.addGroup(groupLayout.createSequentialGroup()
-        					.addGap(28)
-        					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        						.addComponent(chatArea)
-        						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))))
-        			.addGap(18)
-        			.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        			.addGap(18)
-        			.addComponent(chatSendButton)
-        			.addGap(37))
-        );
-        getContentPane().setLayout(groupLayout);
+        getContentPane().setLayout(null);
+        getContentPane().add(circle);
+        getContentPane().add(line);
+        getContentPane().add(cancel);
+        getContentPane().add(colorButton);
+        getContentPane().add(text);
+        getContentPane().add(rectangle);
+        getContentPane().add(triangle);
+        getContentPane().add(panel);
+        getContentPane().add(status);
+        getContentPane().add(chatInput);
+        getContentPane().add(chatLabel);
+        getContentPane().add(chatArea);
+        getContentPane().add(chatSendButton);
         // Menu
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        // FIle Menu
+        // File Menu
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
         JMenuItem NewMI = new JMenuItem(new AbstractAction("New") {
@@ -388,6 +351,7 @@ public class GUI extends JFrame{
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    File fileToSave = fileChooser.getSelectedFile();
 		    logger.info("Save as file: " + fileToSave.getAbsolutePath());
+		    this.filePath = fileToSave.getAbsolutePath();
 		    FileManager.save(fileToSave.getAbsolutePath(), shapes);
 		}
     }
@@ -421,18 +385,25 @@ public class GUI extends JFrame{
     
     private void close() {
     	logger.info("Closing");
-    	int answer = JOptionPane.showConfirmDialog(null, "Do you want to save before close?");
-    	if (answer == 2) {
-    		return;
-    	} 
-    	else if(answer == 0) {
-    		save();
+    	if (shapes.size()>0) {
+    		int answer = JOptionPane.showConfirmDialog(null, "Do you want to save before close?");
+        	if (answer == 2) {
+        		return;
+        	} 
+        	else if(answer == 0) {
+        		save();
+        	}
     	}
     	Server.exit();
     }
     
     public void addChat(String chat) {
-    	chatArea.setText(chatArea.getText()+chat+"\n");
+    	String newChat = chatArea.getText()+chat+"\n";
+    	while((newChat.split("\n")).length > 25) {
+    		newChat = newChat.substring(newChat.indexOf('\n')+1);
+    		logger.info("Chat too tall, remove first line");
+    	}
+    	chatArea.setText(newChat);
     }
     
     public ArrayList<Drawable> getShapes() {

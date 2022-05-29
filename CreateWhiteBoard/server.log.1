@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2022-05-29T19:40:02.684445Z</date>
+  <millis>1653853202684</millis>
+  <nanos>445000</nanos>
+  <sequence>0</sequence>
+  <logger>Server</logger>
+  <level>INFO</level>
+  <class>Server</class>
+  <method>createLogger</method>
+  <thread>1</thread>
+  <message>Message: Logger with DEFAULT FORMATTER</message>
+</record>
+May 30, 2022 5:40:02 AM Server createLogger
+INFO: server starting 
+May 30, 2022 5:40:03 AM Server main
+SEVERE: Failed to create listenting socket
+java.net.BindException: Address already in use
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:555)
+	at java.base/sun.nio.ch.Net.bind(Net.java:544)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:643)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:388)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:274)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:167)
+	at Server.main(Server.java:54)
+

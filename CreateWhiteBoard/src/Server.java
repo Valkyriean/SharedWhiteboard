@@ -105,15 +105,20 @@ public class Server {
 		case "joinRequest":
 			r = request.split("<br>", 3);
 			username= r[1];
+			boolean duplicated = false;
 			for(User user: users) {
 				if(user.username.equals(username)) {
 					logger.info("Duplicated username caused by "+username);
 					out.writeUTF("duplicateUsername");
 					out.flush();
+					duplicated = true;
 					break;
 				}
 			}
-			if(JOptionPane.showConfirmDialog(null, username+" want to join your whiteboard, accept?") == 0) {
+			if(duplicated) {
+				break;
+			}
+			else if(JOptionPane.showConfirmDialog(null, username+" want to join your whiteboard, accept?") == 0) {
 				logger.info(username + " has joined");
 				out.writeUTF("accepted");
 				out.flush();

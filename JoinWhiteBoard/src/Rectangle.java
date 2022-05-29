@@ -7,10 +7,10 @@ public class Rectangle implements Drawable{
 	private final int x, y, w, h;
 	private final Color c;
 	public Rectangle(int x, int y, int x2, int y2, Color c){
-		this.x = x;
-		this.y = y;
-		this.w = x2-x;
-		this.h = y2-y;
+		this.x = Math.min(x, x2);
+		this.y = Math.min(y, y2);
+		this.w = Math.abs(x2-x);
+		this.h = Math.abs(y2-y);
 		this.c = c;
 	}
 	

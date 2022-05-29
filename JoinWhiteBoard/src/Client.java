@@ -14,11 +14,11 @@ import java.util.logging.SimpleFormatter;
 import javax.swing.JOptionPane;
 
 public class Client {
-	public static GUI gui = null;
+	private static GUI gui = null;
 	private static boolean running = true;
 	private static String serverIp;
 	private static int serverPort;
-	public static String username;
+	private static String username;
 	private static final Logger logger = Logger.getLogger(Client.class.getName());
 	public static void main(String[] args) {
 		int listeningPort = 0;
@@ -55,7 +55,7 @@ public class Client {
 		}
 		// Request to join white board
 		if(!requestJoin(username, listeningPort)) {
-			return;
+			System.exit(0);;
 		}
 		// Open window if joined
 		gui = new GUI();
@@ -156,7 +156,7 @@ public class Client {
 				gui.updateUserList(userList);
 				break;
 			case "hostClose":
-				logger.info("Request to close "+r[1]);
+				logger.info("Request to close ");
 				JOptionPane.showMessageDialog(null,"Host has closed the server");
 				running=false;
 				gui.dispose();
@@ -196,6 +196,7 @@ public class Client {
 			System.exit(0);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Error occur in request exit ", e);
+			System.exit(0);
 		}
 	}
 	
@@ -240,5 +241,9 @@ public class Client {
 	
 	public static Logger getLogger() {
 		return logger;
+	}
+	
+	public static String getUsername() {
+		return username;
 	}
 }

@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -17,9 +16,6 @@ import javax.swing.JColorChooser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -42,17 +38,16 @@ public class GUI extends JFrame{
     private JMenu userListMenu;
     private JTextArea chatArea;
     private Logger logger;
-    private JComponent panel_1;
     public GUI(){
     	this.logger = Client.getLogger();
     	this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
-        this.setTitle("Distributed Shared White Board Client: "+Client.username);
+        this.setTitle("Distributed Shared White Board Client: "+Client.getUsername());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
         panel.setBounds(132, 25, 466, 397);
-//        panel.setToolTipText("Draw area");
+        panel.setToolTipText("Draw area");
         panel.setBackground(Color.WHITE);       
         status = new JLabel();
         status.setBounds(132, 9, 466, 16);
@@ -108,7 +103,7 @@ public class GUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
         		state = "rectangle_1";
-        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
+        		status.setText("Rectangle selected, click on canves at where you want first corner be.");
         	}
         });
         // Text
@@ -152,9 +147,10 @@ public class GUI extends JFrame{
         chatSendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	String chat = Client.username+":"+chatInput.getText();
-            	System.out.println(chat);
+            	String chat = chatInput.getText();
+            	logger.info("Said "+chat);
             	if(chat!= null && chat.length()>0) {
+            		chat = Client.getUsername()+":"+chat;
             		int max = 19;
             		while (chat.length()>max) {
             			logger.info("Chat too long, making new line");
@@ -245,7 +241,7 @@ public class GUI extends JFrame{
     		shapes.add(l);
     		Client.postDraw(l.toString());
     		state="null";
-    		status.setText("Plase select the shape you want at left");
+    		status.setText("Plase select the color and shape on left");
     		break;
     	case "circle_1":
     		this.preX=x;
@@ -258,7 +254,7 @@ public class GUI extends JFrame{
     		shapes.add(c);
     		Client.postDraw(c.toString());
     		state="null";
-    		status.setText("Plase select the shape you want at left");
+    		status.setText("Plase select the color and shape on left");
     		break;
     	case "triangle_1":
     		System.out.println("ta1");
@@ -278,27 +274,27 @@ public class GUI extends JFrame{
     		shapes.add(t);
     		Client.postDraw(t.toString());
     		state="null";
-    		status.setText("Plase select the shape you want at left");
+    		status.setText("Plase select the color and shape on left");
     		break;
     	case "rectangle_1":
     		this.preX=x;
     		this.preY=y;
     		state = "rectangle_2";
-    		status.setText("Now, click on canvas at where you want bottom right be.");
+    		status.setText("Now, click on canvas at where you want oppsite corner be.");
     		break;
     	case "rectangle_2":
     		Drawable r = new Rectangle(preX, preY, x, y, currentColor);
     		shapes.add(r);
     		Client.postDraw(r.toString());
     		state="null";
-    		status.setText("Plase select the shape you want at left");
+    		status.setText("Plase select the color and shape on left");
     		break;
     	case "text_1":
     		Drawable te = new Text(x, y,tempText,currentColor);
     		shapes.add(te);
     		Client.postDraw(te.toString());
     		state="null";
-    		status.setText("Plase select the shape you want at left");
+    		status.setText("Plase select the color and shape on left");
     		break;
     	}
     }

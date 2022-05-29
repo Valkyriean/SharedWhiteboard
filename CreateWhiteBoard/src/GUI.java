@@ -7,34 +7,26 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextArea;
-import javax.swing.JScrollBar;
 import javax.swing.DropMode;
 
 public class GUI extends JFrame{
@@ -112,7 +104,7 @@ public class GUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
         		state = "rectangle_1";
-        		status.setText("Rectangle selected, click on canves at where you want top left point be.");
+        		status.setText("Rectangle selected, click on canves at where you want first corner be.");
         	}
         });
         // Text
@@ -314,7 +306,7 @@ public class GUI extends JFrame{
     		this.preX=x;
     		this.preY=y;
     		state = "rectangle_2";
-    		status.setText("Now, click on canvas at where you want bottom right be.");
+    		status.setText("Now, click on canvas at where you want oppsite corner be.");
     		break;
     	case "rectangle_2":
     		Drawable r = new Rectangle(preX, preY, x, y, currentColor);

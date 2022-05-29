@@ -38,6 +38,10 @@ public class Test extends JFrame {
         for(Drawable d: drawList) {
         	d.draw(g2d);
         }
+//        JOptionPane.showConfirmDialog(null,"really?");
+        String a = JOptionPane.showInputDialog("Put text you want below");
+        System.out.println(a);
+//        showInputDialog(null, "This is the message", "This is the default text");
         
 //        g2d.drawPolygon(new int[] {10, 100, 60}, new int[] {10, 10, 50}, 3);
 //        g2d.drawOval(95, 95, 10, 10);

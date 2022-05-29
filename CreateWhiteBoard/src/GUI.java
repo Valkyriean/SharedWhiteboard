@@ -20,6 +20,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -33,7 +35,7 @@ public class GUI extends JFrame{
 
     
     
-    private String state, filePath;
+    private String state = null, filePath=null, tempText = null;
     private int preX,preY,preX1,preY1;
     private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
     private Color currentColor;
@@ -41,12 +43,9 @@ public class GUI extends JFrame{
 
     
     private JLabel status = new JLabel();
-    private JTextField textInput;
     private JTextField chatInput;
     
     public GUI(){
-    	this.state="null";
-    	this.filePath=null;
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
         this.setTitle("Distributed Shared White Board Manager");
@@ -73,6 +72,11 @@ public class GUI extends JFrame{
         
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
+        
+        
+        
+        
+        
         panel.setBackground(Color.WHITE);
         
         
@@ -118,16 +122,14 @@ public class GUI extends JFrame{
         		status.setText("Rectangle selected, click on canves at where you want top left point be.");
         	}
         });
-        
-        // Text button
-        textInput = new JTextField();
-        textInput.setText("Put text here");
-        textInput.setColumns(100);
         text.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        		state = "text_1";
-        		status.setText("Text selected, put in text abrove and click on canves at where text to be.");
+        		tempText = JOptionPane.showInputDialog("Put text you want below");
+        		if (tempText != null) {
+        			state = "text_1";
+            		status.setText("Text selected, click on canves at where text to be.");
+        		}
         	}
         });
         
@@ -166,16 +168,17 @@ public class GUI extends JFrame{
         	groupLayout.createParallelGroup(Alignment.TRAILING)
         		.addGroup(groupLayout.createSequentialGroup()
         			.addContainerGap()
-        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        				.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(circle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(line, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(text, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-        				.addComponent(textInput, 0, 0, Short.MAX_VALUE))
-        			.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+        			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        					.addComponent(circle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(line, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(cancel, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+        					.addComponent(colorButton, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
+        				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+        					.addComponent(text, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(rectangle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(triangle, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)))
+        			.addGap(21)
         			.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
         				.addComponent(chatInput, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
         				.addComponent(chatSendButton)
@@ -196,25 +199,23 @@ public class GUI extends JFrame{
         					.addComponent(status)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(colorButton)
-        					.addGap(9)
+        					.addGap(3)
         					.addComponent(line)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(circle)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(triangle)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(rectangle)
-        					.addGap(18)
-        					.addComponent(textInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addGap(15)
-        					.addComponent(text)
         					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(circle)
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(triangle)
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(rectangle)
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(text)
+        					.addGap(83)
         					.addComponent(cancel))
         				.addGroup(groupLayout.createSequentialGroup()
         					.addComponent(chatLabel)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-        						.addComponent(chatPane)
+        						.addComponent(chatPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
         					.addGap(26)
         					.addComponent(chatInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -285,8 +286,6 @@ public class GUI extends JFrame{
             		repaint();
             	}
             });
-            this.setVisible(true); //probably not necessary
-
         }
 
         
@@ -359,7 +358,7 @@ public class GUI extends JFrame{
     		status.setText("Plase select the shape you want at left");
     		break;
     	case "text_1":
-    		shapes.add(new Text(x, y,textInput.getText() ,currentColor));
+    		shapes.add(new Text(x, y,tempText,currentColor));
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;

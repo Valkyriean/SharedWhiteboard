@@ -1,3 +1,4 @@
+// written by Jiachen Li, 1068299
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -5,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -33,42 +35,31 @@ import java.awt.Font;
 import javax.swing.JTextArea;
 
 public class GUI extends JFrame{
-
-    
-    
-    private String state = null, filePath=null, tempText = null;
+	private ArrayList<Drawable> shapes = new ArrayList<Drawable>();
+	private String state = null, filePath=null, tempText = null;
     private int preX,preY,preX1,preY1;
-    public ArrayList<Drawable> shapes = new ArrayList<Drawable>();
     private Color currentColor;
-    public JMenu kickUserMenu = new JMenu("Kick User");
-
+    private JLabel status; 
     private JTextArea chatArea;
-    private JLabel status = new JLabel();
     private JTextField chatInput;
-    
+    private JMenu kickUserMenu;
+    private Logger logger;
     public GUI(){
+    	this.logger = Server.getLogger();
         this.setSize(800,600);
         this.setPreferredSize(new Dimension(800,600));
-        this.setTitle("Distributed Shared White Board Manager: "+Server.username);
+        this.setTitle("Distributed Shared White Board Manager: "+Server.getUsername());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        
-        this.currentColor = Color.black;
-        JButton colorButton = new JButton("Color");
-        
-        
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
         panel.setToolTipText("Draw area");
-        
-        
-        
-        
-        
         panel.setBackground(Color.WHITE);
-        
-        
+        status = new JLabel();
         status.setText("Plase select the color and shape on left");
-        
+        // Drawing tool box
+        // Color
+        JButton colorButton = new JButton("Color");
+        this.currentColor = Color.black;
         colorButton.setToolTipText("Click to select color, displying selected color");
         colorButton.setFont(new Font("Lucida Grande", Font.BOLD, 13));
         colorButton.addActionListener(new ActionListener() {
@@ -78,7 +69,7 @@ public class GUI extends JFrame{
             	colorButton.setForeground(currentColor);
         	}
         });
-        
+        // Line
         JButton line = new JButton("Line");
         line.addActionListener(new ActionListener() {
             @Override
@@ -87,6 +78,7 @@ public class GUI extends JFrame{
         		status.setText("Line selected, click on canves at where you want line start from.");
         	}
         });
+        // Circle
         JButton circle = new JButton("Circle");
         circle.addActionListener(new ActionListener() {
             @Override
@@ -95,6 +87,7 @@ public class GUI extends JFrame{
         		status.setText("Circle selected, click on canves at where you want center of the circle be.");
         	}
         });
+        // Triangle
         JButton triangle = new JButton("Triangle");
         triangle.addActionListener(new ActionListener() {
             @Override
@@ -103,6 +96,7 @@ public class GUI extends JFrame{
         		status.setText("Triangle selected, click on canves at where you want first point be.");
         	}
         });
+        // Rectangle
         JButton rectangle = new JButton("Rectangle");
         rectangle.addActionListener(new ActionListener() {
             @Override
@@ -111,6 +105,7 @@ public class GUI extends JFrame{
         		status.setText("Rectangle selected, click on canves at where you want top left point be.");
         	}
         });
+        // Text
         JButton text = new JButton("Text");
         text.addActionListener(new ActionListener() {
             @Override
@@ -122,7 +117,7 @@ public class GUI extends JFrame{
         		}
         	}
         });
-        
+        // Cancel
         JButton cancel = new JButton("Cancel");
         cancel.setToolTipText("Abort action and reselect shape");
         cancel.addActionListener(new ActionListener() {
@@ -132,29 +127,20 @@ public class GUI extends JFrame{
         		status.setText("Plase select the color above and shape on left");
         	}
         });
-        
-        
-        
-        
+        // Chat
+        JLabel chatLabel = new JLabel("Chat");
         chatInput = new JTextField();
         chatInput.setToolTipText("Input chat here");
         chatInput.setColumns(20);
-        
-        
-        
-        JLabel chatLabel = new JLabel("Chat");
-        
         chatArea = new JTextArea();
         chatArea.setToolTipText("Chat Box");
         chatArea.setWrapStyleWord(true);
         chatArea.setEditable(false);
-        
-        
         JButton chatSendButton = new JButton("Send");
         chatSendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	String chat = Server.username+":"+chatInput.getText();
+            	String chat = Server.getUsername()+":"+chatInput.getText();
             	System.out.println(chat);
             	if(chat!= null && chat.length()>0) {
             		int max = 19;
@@ -168,11 +154,7 @@ public class GUI extends JFrame{
             	}
         	}
         });
-        
-        
-        
-        
-        
+        //Layout
         GroupLayout groupLayout = new GroupLayout(getContentPane());
         groupLayout.setHorizontalGroup(
         	groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -243,16 +225,16 @@ public class GUI extends JFrame{
         			.addGap(37))
         );
         getContentPane().setLayout(groupLayout);
-        
+        // Menu
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        
+        // FIle Menu
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
-        
         JMenuItem NewMI = new JMenuItem(new AbstractAction("New") {
             public void actionPerformed(ActionEvent e) {
-            	shapes = new ArrayList<Drawable>();	            	
+            	logger.info("New canvas");
+            	shapes.clear();	            	
             	repaint();
             }
         });
@@ -285,20 +267,15 @@ public class GUI extends JFrame{
             	close();
             }
         });
-        
-        fileMenu.add(closeMI);
-        
-        
-        
+        fileMenu.add(closeMI);  
+        // Kick User Menu
+        kickUserMenu = new JMenu("Kick User");
         menuBar.add(kickUserMenu);
-      
-        
+        //initializing complete
         this.setVisible(true);
-
-
     }
-
     
+    // Panel for drawing
     public class GraphicsPanel extends JPanel {
 
         public GraphicsPanel(){
@@ -310,8 +287,7 @@ public class GUI extends JFrame{
             	}
             });
         }
-
-        
+        // Draw shapes
         public void paint(Graphics g){
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
@@ -322,12 +298,8 @@ public class GUI extends JFrame{
         }
     }
     
-    
+    // Action on click based on state machine
     private void click(int x, int y) {
-//    	System.out.println(x);
-//    	System.out.println(y);
-//    	System.out.println(state);
-//    	System.out.println(shapes);
     	switch (state) {
     	case "line_1":
     		this.preX=x;
@@ -395,11 +367,12 @@ public class GUI extends JFrame{
     		state="null";
     		status.setText("Plase select the shape you want at left");
     		break;
-    	
     	}
     }
     
+    // Save canvas current file
     private void save() {
+    	logger.info("Save to current file");
     	if (filePath == null) {
     		saveAs();
     	}else {
@@ -407,28 +380,30 @@ public class GUI extends JFrame{
     	}
     }
     
+    // Save canvas to new file
     private void saveAs() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Specify a file to save");   
 		int userSelection = fileChooser.showSaveDialog(this); 
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    File fileToSave = fileChooser.getSelectedFile();
+		    logger.info("Save as file: " + fileToSave.getAbsolutePath());
 		    FileManager.save(fileToSave.getAbsolutePath(), shapes);
-		    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 		}
     }
     
+    // Load canvas from file
     private void open() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Specify a file to open");   
 		int userSelection = fileChooser.showOpenDialog(this); 
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    File fileToOpen = fileChooser.getSelectedFile();
+		    logger.info("Open file: " + fileToOpen.getAbsolutePath());
+		    this.filePath = fileToOpen.getAbsolutePath();
 		    this.shapes = FileManager.open(fileToOpen);
 		    repaint();
-		    this.filePath = fileToOpen.getAbsolutePath();
 		    Server.broadcastNewFile();
-		    System.out.println("Open as file: " + fileToOpen.getAbsolutePath());
 		}
     }
     
@@ -445,6 +420,7 @@ public class GUI extends JFrame{
     }
     
     private void close() {
+    	logger.info("Closing");
     	int answer = JOptionPane.showConfirmDialog(null, "Do you want to save before close?");
     	if (answer == 2) {
     		return;
@@ -458,4 +434,12 @@ public class GUI extends JFrame{
     public void addChat(String chat) {
     	chatArea.setText(chatArea.getText()+chat+"\n");
     }
+    
+    public ArrayList<Drawable> getShapes() {
+		return shapes;
+	}
+
+	public JMenu getKickUserMenu() {
+		return kickUserMenu;
+	}
 }

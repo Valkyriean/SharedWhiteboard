@@ -1,5 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+// written by Jiachen Li, 1068299
 
 public class User {
 	public final String username, ip;
@@ -8,8 +7,6 @@ public class User {
 		this.username = username;
 		this.ip = ip;
 		this.port = Integer.parseInt(port);
-		
-		// TODO Auto-generated constructor stub
 	}
 
 }

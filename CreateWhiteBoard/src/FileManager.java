@@ -1,14 +1,16 @@
+// written by Jiachen Li, 1068299
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 public class FileManager {
-
+	// Save canvas to file
 	public static void save(String file, ArrayList<Drawable> shapes) {
 		try {
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
@@ -16,17 +18,11 @@ public class FileManager {
 				out.println(d.toString());
 			}
 			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch(Exception e) {
-			e.printStackTrace();
+			Server.getLogger().log(Level.SEVERE, "Error occur in save", e);
 		}
-	    
-		
-		
-		
 	}
-	
+	// Open canvas from file
 	public static ArrayList<Drawable> open(File file){
 		ArrayList<Drawable> shapes = new ArrayList<Drawable>();
 		try {
@@ -57,15 +53,8 @@ public class FileManager {
 		    myReader.close();
 		} 
 		catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-		    e.printStackTrace();
-		}
-		
+			Server.getLogger().log(Level.SEVERE, "Error occur in open", e);
+		}	
 		return shapes;
 	}
-	
-	public static void main(String[] args) throws IOException {
-		open(new File("123.txt"));
-	}
-
 }

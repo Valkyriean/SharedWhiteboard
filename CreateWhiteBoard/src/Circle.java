@@ -1,3 +1,5 @@
+// written by Jiachen Li, 1068299
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 

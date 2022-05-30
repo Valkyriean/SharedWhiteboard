@@ -182,6 +182,9 @@ public class Client {
 			socket.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Error occur in post draw " + drawable, e);
+			// Server lost
+			JOptionPane.showMessageDialog(null,"Connection Lost, client will close");
+			exit();
 		}
 	}
 	
@@ -236,6 +239,8 @@ public class Client {
 			socket.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Error occur in send chat to server: "+chat, e);
+			JOptionPane.showMessageDialog(null,"Connection Lost, client will close");
+			exit();
 		}
 	}
 	

@@ -46,7 +46,7 @@ public class GUI extends JFrame{
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         JComponent panel = new GraphicsPanel();
 //        JComponent panel = new JPanel();
-        panel.setBounds(132, 25, 466, 397);
+        panel.setBounds(132, 25, 466, 400);
         panel.setToolTipText("Draw area");
         panel.setBackground(Color.WHITE);       
         status = new JLabel();
@@ -240,8 +240,8 @@ public class GUI extends JFrame{
     		Drawable l = new Line(preX, preY, x, y, currentColor);
     		shapes.add(l);
     		Client.postDraw(l.toString());
-    		state="null";
-    		status.setText("Plase select the color and shape on left");
+    		state="line_1";
+    		status.setText("Line selected, click on canves at where you want line start from.");
     		break;
     	case "circle_1":
     		this.preX=x;
@@ -253,8 +253,8 @@ public class GUI extends JFrame{
     		Drawable c = new Circle(preX, preY, x, y, currentColor);
     		shapes.add(c);
     		Client.postDraw(c.toString());
-    		state="null";
-    		status.setText("Plase select the color and shape on left");
+    		state="circle_1";
+    		status.setText("Circle selected, click on canves at where you want center of the circle be.");
     		break;
     	case "triangle_1":
     		System.out.println("ta1");
@@ -273,8 +273,8 @@ public class GUI extends JFrame{
     		Drawable t = new Triangle(preX, preY, preX1, preY1, x, y, currentColor);
     		shapes.add(t);
     		Client.postDraw(t.toString());
-    		state="null";
-    		status.setText("Plase select the color and shape on left");
+    		state="triangle_1";
+    		status.setText("Triangle selected, click on canves at where you want first point be.");
     		break;
     	case "rectangle_1":
     		this.preX=x;
@@ -286,15 +286,15 @@ public class GUI extends JFrame{
     		Drawable r = new Rectangle(preX, preY, x, y, currentColor);
     		shapes.add(r);
     		Client.postDraw(r.toString());
-    		state="null";
-    		status.setText("Plase select the color and shape on left");
+    		state="rectangle_1";
+    		status.setText("Rectangle selected, click on canves at where you want first corner be.");
     		break;
     	case "text_1":
     		Drawable te = new Text(x, y,tempText,currentColor);
     		shapes.add(te);
     		Client.postDraw(te.toString());
     		state="null";
-    		status.setText("Plase select the color and shape on left");
+    		status.setText("Plase select the shape you want at left");
     		break;
     	}
     }

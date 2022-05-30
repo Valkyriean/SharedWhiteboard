@@ -199,9 +199,9 @@ public class Server {
 			client.close();
 		}catch(Exception e) {
 			//Disconnected user removal
-//			users.remove(user);
-//			gui.updateKickList(users);
-//			broadcastUserList();
+			users.remove(user);
+			gui.updateKickList(users);
+			broadcastUserList();
 			logger.log(Level.SEVERE, "Send drawable "+drawable+" to "+user+"failed", e);
 		}
 	}
